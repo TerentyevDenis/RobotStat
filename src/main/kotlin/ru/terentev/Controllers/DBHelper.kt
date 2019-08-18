@@ -8,6 +8,7 @@ import ru.terentev.view.statusBar
 import ru.terentev.view.updateTable
 import sun.invoke.empty.Empty
 import tornadofx.*
+import java.io.File
 import java.sql.*
 import java.text.DecimalFormat
 import java.util.ArrayList
@@ -73,32 +74,36 @@ class DBHelper(){
         }
     }
 
-    fun putListInDB(list: ArrayList<Test>){
-        runAsync (statusBar){
-            updateMessage("Loading results...")
-            opendb { conn ->
-                conn.createStatement().execute("INSERT INTO $TABLE_BUILD($COLUMN_ADD_DATE) VALUES (CURRENT_TIMESTAMP)")
-                var buildIDqury = conn.createStatement().executeQuery("SELECT $COLUMN_BUILD_ID from $TABLE_BUILD WHERE $COLUMN_BUILD_ID = last_insert_rowid()")
-                var buildID = buildIDqury.getInt("_id")
-                for ((i,test) in list.withIndex()) {
-                    updateProgress(i.toDouble(), list.size.toDouble())
-                    if (!conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).executeQuery(
-                                    "SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';").next()) {
-                        conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME) VALUES ('" + test.name + "');")
+    fun putListInDB(dirs: List<File>){
+        runAsync (statusBar) {
+            for (dir in dirs) {
+                val list = xmlparser(dir.inputStream())
+                updateMessage("Loading ${dir.name}...")
+                opendb { conn ->
+                    conn.createStatement().execute("INSERT INTO $TABLE_BUILD($COLUMN_ADD_DATE) VALUES (CURRENT_TIMESTAMP)")
+                    var buildIDqury = conn.createStatement().executeQuery("SELECT $COLUMN_BUILD_ID from $TABLE_BUILD WHERE $COLUMN_BUILD_ID = last_insert_rowid()")
+                    var buildID = buildIDqury.getInt("_id")
+                    for ((i, test) in list.withIndex()) {
+                        updateProgress(i.toDouble(), list.size.toDouble())
+                        if (!conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).executeQuery(
+                                        "SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';").next()) {
+                            conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME) VALUES ('" + test.name + "');")
+                        }
+                        var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';")
+                        rs.next()
+                        var test_id = rs.getInt("_id")
+                        rs.close()
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+                        conn.createStatement().execute("INSERT INTO tests_duration(test_id, starttime, duration, testresult, build_id) " +
+                                "VALUES (" + test_id + ", strftime('%Y-%m-%d %H:%M:%f','" + formatter.format(test.start) + "'), "
+                                + test.time + ", '" + test.status?.name + "', " + buildID + ");")
                     }
-                    var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';")
-                    rs.next()
-                    var test_id = rs.getInt("_id")
-                    rs.close()
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-                    conn.createStatement().execute("INSERT INTO tests_duration(test_id, starttime, duration, testresult, build_id) " +
-                            "VALUES (" + test_id + ", strftime('%Y-%m-%d %H:%M:%f','" + formatter.format(test.start) + "'), "
-                            + test.time + ", '" + test.status?.name + "', " +buildID +");")
                 }
             }
-            updateMessage("Updating table...")
-            updateProgress(0.4,1.0)
-            updateTable()
+                updateMessage("Updating table...")
+                updateProgress(0.4, 1.0)
+                updateTable()
+
         }
     }
 

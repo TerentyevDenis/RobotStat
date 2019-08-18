@@ -12,10 +12,10 @@ class MenuBar : Fragment() {
             item("Add output.xml") {
                 this.setOnAction {
                     val ef = arrayOf(FileChooser.ExtensionFilter("Output robot files (.xml)", "*.xml"))
-                    var dir = tornadofx.chooseFile("Single + non/block", ef, FileChooserMode.Single)
-                    if (!dir.isEmpty()) {
+                    var dirs = tornadofx.chooseFile("Multi + non/block", ef, FileChooserMode.Multi)
+                    if (!dirs.isEmpty()) {
                         run{
-                            import(dir)
+                            import(dirs)
                             this.disableWhen(statusBar.running)
                             }
                         }

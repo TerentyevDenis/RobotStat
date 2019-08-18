@@ -12,7 +12,7 @@ import java.util.ArrayList
 
 
 fun import(dir: List<File>){
-        DBHelper().putListInDB(xmlparser(dir.first().inputStream()))
+        DBHelper().putListInDB(dir)
 }
 
 fun xmlparser(str: InputStream):ArrayList<Test>{
