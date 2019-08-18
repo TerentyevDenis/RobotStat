@@ -50,7 +50,7 @@ class TableTests : Fragment() {
 
 fun updateTable(){
     if (rows.isNotEmpty()) {
-        rows.remove(0, rows.size)
+        rows.clear()
     }
         rows.addAll(DBHelper().putDBintoList())
 }

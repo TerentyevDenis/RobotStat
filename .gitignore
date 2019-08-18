@@ -1,5 +1,5 @@
 TestResult.db
-target\
+target/
 .idea\
 /.idea/.gitignore
 /target/classes/ru/terentev/view/Charts$root$1$1$1$1.class
@@ -134,3 +134,7 @@ target\
 /target/classes/ru/terentev/Model/Test.class
 /target/classes/ru/terentev/Controllers/ValidateRegexpKt.class
 /.idea/vcs.xml
+/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+/target/maven-archiver/pom.properties
+/target/classes/META-INF/tornadofx-maven-project.kotlin_module
+/target/tornadofx-maven-project-1.0.jar

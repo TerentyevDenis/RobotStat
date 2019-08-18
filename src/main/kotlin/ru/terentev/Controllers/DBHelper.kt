@@ -110,10 +110,10 @@ class DBHelper(){
             var qury:ResultSet
             when(selectedStatus.value) {
                 Status.PASS.name -> qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' " +
-                        "and testresult='${Status.PASS.name}';")
+                        "and testresult='${Status.PASS.name}' ORDER BY starttime, _id;")
                 Status.FAIL.name -> qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' " +
-                        "and testresult='${Status.FAIL.name}';")
-                else -> qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "';")
+                        "and testresult='${Status.FAIL.name}' ORDER BY starttime, _id;")
+                else -> qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' ORDER BY starttime, _id;")
             }
             while (qury.next()) {
                 duration.add(StatusTime(qury.getDouble("duration"), Status.valueOf(qury.getString("testresult"))))
