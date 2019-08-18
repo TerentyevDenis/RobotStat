@@ -1,0 +1,6 @@
+.idea\
+target\
+TestResult.db
+
+# Project exclude paths
+/target/
