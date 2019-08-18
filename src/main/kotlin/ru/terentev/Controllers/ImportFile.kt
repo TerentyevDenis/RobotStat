@@ -6,13 +6,28 @@ import java.io.InputStream
 import org.xmlpull.v1.*
 import ru.terentev.Model.Status
 import ru.terentev.Model.Test
+import ru.terentev.view.statusBar
+import ru.terentev.view.updateTable
+import tornadofx.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.ArrayList
+import kotlin.math.absoluteValue
 
 
-fun import(dir: List<File>){
-        DBHelper().putListInDB(dir)
+fun import(dirs: List<File>){
+    runAsync(statusBar){
+        for (dir in dirs) {
+            updateMessage("Uploading ${dir.name}...")
+            var list = xmlparser(dir.inputStream())
+            var helper = DBHelper()
+            helper.progress.addListener(ChangeListener { observable, oldValue, newValue -> updateProgress(newValue.toDouble(),list.size.toDouble()) })
+            helper.putListInDB(list)
+        }
+        updateMessage("Updating table...")
+        updateProgress(0.4, 1.0)
+        updateTable()
+    }
 }
 
 fun xmlparser(str: InputStream):ArrayList<Test>{

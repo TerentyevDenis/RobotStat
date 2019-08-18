@@ -1,5 +1,6 @@
 package ru.terentev.Controllers
 
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import ru.terentev.Model.*
@@ -18,6 +19,8 @@ import kotlin.math.abs
 
 
 class DBHelper(){
+
+    val progress = SimpleIntegerProperty(0)
 
     companion object {
         private val DATABASE_VERSION = 1
@@ -74,17 +77,13 @@ class DBHelper(){
         }
     }
 
-    fun putListInDB(dirs: List<File>){
-        runAsync (statusBar) {
-            for (dir in dirs) {
-                val list = xmlparser(dir.inputStream())
-                updateMessage("Loading ${dir.name}...")
+    fun putListInDB(list: ArrayList<Test>){
                 opendb { conn ->
                     conn.createStatement().execute("INSERT INTO $TABLE_BUILD($COLUMN_ADD_DATE) VALUES (CURRENT_TIMESTAMP)")
                     var buildIDqury = conn.createStatement().executeQuery("SELECT $COLUMN_BUILD_ID from $TABLE_BUILD WHERE $COLUMN_BUILD_ID = last_insert_rowid()")
                     var buildID = buildIDqury.getInt("_id")
                     for ((i, test) in list.withIndex()) {
-                        updateProgress(i.toDouble(), list.size.toDouble())
+                        progress.set(i)
                         if (!conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).executeQuery(
                                         "SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';").next()) {
                             conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME) VALUES ('" + test.name + "');")
@@ -99,13 +98,8 @@ class DBHelper(){
                                 + test.time + ", '" + test.status?.name + "', " + buildID + ");")
                     }
                 }
-            }
-                updateMessage("Updating table...")
-                updateProgress(0.4, 1.0)
-                updateTable()
 
         }
-    }
 
     fun putDBintoList(): ObservableList<Row> {
         var result = ArrayList<Row>()
