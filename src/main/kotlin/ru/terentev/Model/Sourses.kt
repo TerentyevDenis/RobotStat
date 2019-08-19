@@ -17,6 +17,6 @@ val statuses = FXCollections.observableArrayList(Status.All.name,Status.FAIL.nam
 
 val selectedStatus = SimpleStringProperty()
 
-val selectedRow = SimpleIntegerProperty()
+val selectedRow = SimpleIntegerProperty(-1)
 
 var filter = SimpleStringProperty()

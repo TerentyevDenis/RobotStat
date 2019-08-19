@@ -4,6 +4,8 @@ import ru.terentev.Controllers.import
 import javafx.application.Platform.exit
 import javafx.stage.FileChooser
 import ru.terentev.Controllers.DBHelper
+import ru.terentev.Model.rows
+import ru.terentev.Model.selectedRow
 import tornadofx.*
 
 class MenuBar : Fragment() {
@@ -14,21 +16,63 @@ class MenuBar : Fragment() {
                     val ef = arrayOf(FileChooser.ExtensionFilter("Output robot files (.xml)", "*.xml"))
                     var dirs = tornadofx.chooseFile("Multi + non/block", ef, FileChooserMode.Multi)
                     if (!dirs.isEmpty()) {
-                        run{
+                        run {
                             import(dirs)
                             this.disableWhen(statusBar.running)
+                        }
+                    }
+                }
+            }
+            item("Quit") {
+                this.setOnAction { exit() }
+
+            }
+        }
+        menu("Deleting") {
+            item("Delete selected row") {
+                this.setOnAction {
+                    if (selectedRow.value != -1) {
+                        confirm("Confirm delete", "Do you want to delete statistic of ${getName(selectedRow.value)} test?") {
+                            runAsync(statusBar) {
+                                DBHelper().deletingTest(selectedRow.value)
+                                updateMessage("Updating table...")
+                                updateProgress(0.4, 1.0)
+                                updateTable()
                             }
                         }
                     }
                 }
-
-                item("Save") {
+            }
+            item("Delete last uploaded file") {
+                this.setOnAction {
+                    confirm("Confirm delete", "Do you want to delete statistic of last file?") {
+                        runAsync(statusBar) {
+                            DBHelper().deletingLastFile()
+                            DBHelper().deleteEmptyTests()
+                            updateMessage("Updating table...")
+                            updateProgress(0.4, 1.0)
+                            updateTable()
+                        }
+                    }
                 }
-                item("Quit") {
-                    this.setOnAction { exit() }
-
+            }
+            item("Clear database") {
+                this.setOnAction {
+                    confirm("Confirm delete", "Do you want to clear database?") {
+                        runAsync(statusBar) {
+                            DBHelper().clearDB()
+                            updateMessage("Updating table...")
+                            updateProgress(0.4, 1.0)
+                            updateTable()
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+fun getName(id: Int): String {
+    return rows.filter { it.id == id }.last().name
 }
 

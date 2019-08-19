@@ -79,6 +79,7 @@ class DBHelper(){
 
     fun putListInDB(list: ArrayList<Test>){
                 opendb { conn ->
+                    conn.createStatement().execute("BEGIN TRANSACTION;")
                     conn.createStatement().execute("INSERT INTO $TABLE_BUILD($COLUMN_ADD_DATE) VALUES (CURRENT_TIMESTAMP)")
                     var buildIDqury = conn.createStatement().executeQuery("SELECT $COLUMN_BUILD_ID from $TABLE_BUILD WHERE $COLUMN_BUILD_ID = last_insert_rowid()")
                     var buildID = buildIDqury.getInt("_id")
@@ -97,6 +98,7 @@ class DBHelper(){
                                 "VALUES (" + test_id + ", strftime('%Y-%m-%d %H:%M:%f','" + formatter.format(test.start) + "'), "
                                 + test.time + ", '" + test.status?.name + "', " + buildID + ");")
                     }
+                    conn.createStatement().execute("END TRANSACTION;")
                 }
 
         }
@@ -136,6 +138,35 @@ class DBHelper(){
             }
         }
         return duration
+    }
+
+    fun deletingTest(id:Int){
+        opendb { conn ->
+            conn.createStatement().execute("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID=$id")
+        }
+    }
+
+    fun deletingLastFile(){
+        opendb { conn ->
+            conn.createStatement().execute("DELETE FROM $TABLE_BUILD WHERE _id = (SELECT MAX(_id) FROM $TABLE_BUILD)")
+        }
+    }
+
+    fun deleteEmptyTests(){
+        opendb { conn ->
+            conn.createStatement().execute("DELETE FROM tests WHERE _id IN (SELECT _id FROM (select * from tests " +
+                    "LEFT JOIN tests_duration td on tests._id = td.test_id) WHERE test_id IS NULL);")
+        }
+    }
+
+    fun clearDB(){
+        opendb { conn ->
+            conn.createStatement().execute("BEGIN TRANSACTION;")
+            conn.createStatement().execute("DELETE FROM $TABLE_TEST")
+            conn.createStatement().execute("DELETE FROM $TABLE_NAME")
+            conn.createStatement().execute("DELETE FROM $TABLE_BUILD")
+            conn.createStatement().execute("END TRANSACTION;")
+        }
     }
 }
 
