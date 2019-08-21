@@ -4,8 +4,8 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.scene.chart.XYChart
+import ru.terentev.Model.Settings.VarianceAssertSettings
 import tornadofx.*
-import java.util.*
 
 var rows = SortedFilteredList(FXCollections.observableArrayList<Row>())
 
@@ -20,3 +20,5 @@ val selectedStatus = SimpleStringProperty()
 val selectedRow = SimpleIntegerProperty(-1)
 
 var filter = SimpleStringProperty()
+
+var varianceAssertSettings= VarianceAssertSettings()

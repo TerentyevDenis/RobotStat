@@ -21,7 +21,6 @@ import javax.swing.text.TableView
 
 class MainView : View("Robot statistic") {
 
-
     override val root = vbox{
         prefHeight = 700.0
         prefWidth = 800.0

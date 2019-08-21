@@ -7,6 +7,7 @@ import ru.terentev.Controllers.DBHelper
 import ru.terentev.Model.rows
 import ru.terentev.Model.selectedRow
 import tornadofx.*
+import javax.xml.soap.Node
 
 class MenuBar : Fragment() {
     override val root = menubar() {
@@ -22,6 +23,9 @@ class MenuBar : Fragment() {
                         }
                     }
                 }
+            }
+            item("Assert settings"){
+                setOnAction{ openInternalWindow<AutoCheckSettings>( owner = find(MainView::class).root) }
             }
             item("Quit") {
                 this.setOnAction { exit() }
