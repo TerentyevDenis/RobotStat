@@ -25,6 +25,7 @@ fun import(dirs: List<File>){
         updateMessage("Updating table...")
         updateProgress(0.4, 1.0)
         updateTable()
+        assert()
     }
 }
 

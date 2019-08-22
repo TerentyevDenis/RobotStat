@@ -140,6 +140,18 @@ class DBHelper(){
         return duration
     }
 
+    fun getAllTimeSeries(id:Int):ArrayList<StatusTime> {
+        var duration = ArrayList<StatusTime>()
+        opendb { conn ->
+            var qury:ResultSet
+            qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' ORDER BY starttime, _id;")
+            while (qury.next()) {
+                duration.add(StatusTime(qury.getDouble("duration"), Status.valueOf(qury.getString("testresult"))))
+            }
+        }
+        return duration
+    }
+
     fun deletingTest(id:Int){
         opendb { conn ->
             conn.createStatement().execute("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID=$id")
@@ -170,12 +182,12 @@ class DBHelper(){
     }
 }
 
-fun mean(list:ArrayList<StatusTime>):Double{
+fun mean(list:List<StatusTime>):Double{
     var result = list.sumByDouble { it.time }/list.size
     return result
 }
 
-fun variance(list:ArrayList<StatusTime>):Double{
+fun variance(list:List<StatusTime>):Double{
     var m = (mean(list))
     var result = abs(list.sumByDouble { it.time*it.time }/list.size - m*m)
     return result

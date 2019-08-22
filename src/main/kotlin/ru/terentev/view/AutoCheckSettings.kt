@@ -2,6 +2,7 @@ package ru.terentev.view
 
 import javafx.geometry.Pos
 import jdk.nashorn.internal.runtime.PropertyListeners.addListener
+import ru.terentev.Controllers.assert
 import ru.terentev.Model.SettingsModel.VarianceAssertModel
 import ru.terentev.Model.varianceAssertSettings
 import tornadofx.*
@@ -36,6 +37,7 @@ class AutoCheckSettings : View("Assert settings") {
                 buttonbar {
                     button("Save").action {
                         modelVariance.commit()
+                        assert()
                     }
                     button("Cancel").action{
                         modelVariance.rollback()

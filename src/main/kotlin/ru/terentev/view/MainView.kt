@@ -43,6 +43,7 @@ class MainView : View("Robot statistic") {
         super.onBeforeShow()
             DBHelper().createTable()
             updateTable()
+            ru.terentev.Controllers.assert()
     }
 }
 

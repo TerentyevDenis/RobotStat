@@ -33,11 +33,12 @@ class TableTests : Fragment() {
         }
 
         tableview(rows) {
-            column("name", Row::name).pctWidth(40.0)
-            column("pass amount", Row::pass).pctWidth(15.0)
-            column("fail amount", Row::fail).pctWidth(15.0)
-            column("time variance", Row::varianceform).pctWidth(15.0)
-            column("mean time", Row::meanform).pctWidth(15.0)
+            column("name", Row::name).pctWidth(30.0)
+            column("pass amount", Row::pass).pctWidth(10.0)
+            column("fail amount", Row::fail).pctWidth(10.0)
+            column("time variance", Row::varianceform).pctWidth(10.0)
+            column("mean time", Row::meanform).pctWidth(10.0)
+            column("assert massages",Row::assertResult).pctWidth(30.0)
             columnResizePolicy = SmartResize.POLICY
             onUserSelect(1) { row ->
                 selectedRow.set(row.id)

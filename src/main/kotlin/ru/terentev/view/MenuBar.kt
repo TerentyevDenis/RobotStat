@@ -25,7 +25,7 @@ class MenuBar : Fragment() {
                 }
             }
             item("Assert settings"){
-                setOnAction{ openInternalWindow<AutoCheckSettings>( owner = find(MainView::class).root) }
+                setOnAction{ openInternalWindow<AutoCheckSettings>( modal = false,owner = find(MainView::class).root) }
             }
             item("Quit") {
                 this.setOnAction { exit() }
