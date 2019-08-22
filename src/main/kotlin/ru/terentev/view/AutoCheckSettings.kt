@@ -30,7 +30,7 @@ class AutoCheckSettings : View("Assert settings") {
                         text=df.format(modelVariance.part.value)
                         modelVariance.part.addListener(ChangeListener { observable, oldValue, newValue -> text=df.format(newValue) })
                     }
-                    label("Max variance a part of mean value") {
+                    label("Max variance as a part of mean value") {
                         alignment = Pos.TOP_CENTER
                     }
                 }

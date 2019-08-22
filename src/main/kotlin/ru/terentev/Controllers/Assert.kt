@@ -21,9 +21,7 @@ fun assert(){
                 row.assertResult = "pass"
             } else
                 row.assertResult = massage.dropLast(2)
-            massage=""
 
         }
-
     }
 }
