@@ -39,6 +39,9 @@ class DBHelper(){
         val COLUMN_BUILD_ID = "_id"
         val COLUMN_JENKINS_ID = "jenkins_id"
         val COLUMN_ADD_DATE = "add_date"
+        val TABLE_SETTINGS_VARIANCE = "settings_var"
+        val COLUMN_ACTIVE = "active"
+        val COLUMN_PART = "part"
     }
 
     fun opendb(exec:(Connection)->Unit){
@@ -74,6 +77,10 @@ class DBHelper(){
                     "$COLUMN_BUILDID INTEGER NOT NULL,\n" +
                     "FOREIGN KEY ($COLUMN_TEST_ID) REFERENCES $TABLE_NAME($COLUMN_ID) ON DELETE CASCADE,\n" +
                     "FOREIGN KEY ($COLUMN_BUILDID) REFERENCES $TABLE_BUILD($COLUMN_BUILD_ID) ON DELETE CASCADE);")
+            conn.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS $TABLE_SETTINGS_VARIANCE (\n" +
+                            "$COLUMN_ACTIVE BOOLEAN,\n" +
+                            "$COLUMN_PART DOUBLE);\n")
         }
     }
 
@@ -180,6 +187,23 @@ class DBHelper(){
             conn.createStatement().execute("END TRANSACTION;")
         }
     }
+
+    fun getSettings(){
+        opendb { conn ->
+            var res = conn.createStatement().executeQuery("SELECT * FROM $TABLE_SETTINGS_VARIANCE")
+            if (res.next()) {
+                varianceAssertSettings.active = res.getBoolean(COLUMN_ACTIVE)
+                varianceAssertSettings.part = res.getDouble(COLUMN_PART)
+            }
+        }
+    }
+    fun saveSettings(){
+        opendb { conn ->
+            conn.createStatement().execute("DELETE FROM $TABLE_SETTINGS_VARIANCE")
+            conn.createStatement().execute("INSERT INTO $TABLE_SETTINGS_VARIANCE($COLUMN_ACTIVE,$COLUMN_PART)" +
+                    " VALUES ('${varianceAssertSettings.active.toInt()}',${varianceAssertSettings.part})")
+        }
+    }
 }
 
 fun mean(list:List<StatusTime>):Double{
@@ -191,4 +215,10 @@ fun variance(list:List<StatusTime>):Double{
     var m = (mean(list))
     var result = abs(list.sumByDouble { it.time*it.time }/list.size - m*m)
     return result
+}
+
+fun Boolean.toInt():Int{
+    return if (this){
+        1
+    }else 0
 }

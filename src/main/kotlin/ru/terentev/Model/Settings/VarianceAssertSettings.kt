@@ -28,7 +28,7 @@ class VarianceAssertSettings(active: Boolean = true, part: Double = 0.2 ) : Asse
         return result
     }
 
-    val partProperty = SimpleDoubleProperty(this,"active",part)
+    val partProperty = SimpleDoubleProperty(this,"part",part)
     var part by partProperty
 
 }

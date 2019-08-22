@@ -37,11 +37,13 @@ class MainView : View("Robot statistic") {
             visibleWhen(statusBar.running)
             paddingAll = 4
         }
+        primaryStage.setOnCloseRequest { DBHelper().saveSettings() }
     }
 
     override fun onBeforeShow() {
         super.onBeforeShow()
             DBHelper().createTable()
+            DBHelper().getSettings()
             updateTable()
             ru.terentev.Controllers.assert()
     }
