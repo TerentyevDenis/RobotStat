@@ -28,6 +28,7 @@ class DBHelper(){
         val TABLE_NAME = "tests"
         val COLUMN_ID = "_id"
         val COLUMN_NAME = "testname"
+        val COLUMN_SUITE = "suitename"
         val TABLE_TEST = "tests_duration"
         val COLUMN_RESULT_ID = "_id"
         val COLUMN_TEST_ID = "test_id"
@@ -61,7 +62,8 @@ class DBHelper(){
             conn.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS $TABLE_NAME (\n" +
                             "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                            "$COLUMN_NAME TEXT NOT NULL UNIQUE);\n")
+                            "$COLUMN_SUITE TEXT NOT NULL,\n"+
+                            "$COLUMN_NAME TEXT NOT NULL);\n")
             conn.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS $TABLE_BUILD (\n" +
                             "$COLUMN_BUILD_ID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -93,10 +95,10 @@ class DBHelper(){
                     for ((i, test) in list.withIndex()) {
                         progress.set(i)
                         if (!conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).executeQuery(
-                                        "SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';").next()) {
-                            conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME) VALUES ('" + test.name + "');")
+                                        "SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "' and $COLUMN_SUITE='" + test.suiteName + "';").next()) {
+                            conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME, $COLUMN_SUITE) VALUES ('" + test.name + "','" + test.suiteName + "');")
                         }
-                        var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "';")
+                        var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + test.name + "' and $COLUMN_SUITE='" + test.suiteName + "';")
                         rs.next()
                         var test_id = rs.getInt("_id")
                         rs.close()
@@ -119,9 +121,9 @@ class DBHelper(){
                 var qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='"+id+"';")
                 var duration = ArrayList<StatusTime>()
                 while (qury.next()){
-                    duration.add(StatusTime(qury.getDouble("duration"), Status.valueOf(qury.getString("testresult"))))
+                    duration.add(StatusTime(qury.getDouble("duration"),qury.getString("starttime"), Status.valueOf(qury.getString("testresult"))))
                 }
-                var row=Row(id,rs.getString("testname"),duration.count{it.status==Status.PASS},
+                var row=Row(id, rs.getString(COLUMN_SUITE), rs.getString("testname"),duration.count{it.status==Status.PASS},
                         duration.count{it.status==Status.FAIL}, variance(duration), mean(duration))
                 result.add(row)
             }
@@ -141,7 +143,7 @@ class DBHelper(){
                 else -> qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' ORDER BY starttime, _id;")
             }
             while (qury.next()) {
-                duration.add(StatusTime(qury.getDouble("duration"), Status.valueOf(qury.getString("testresult"))))
+                duration.add(StatusTime(qury.getDouble("duration"),qury.getString("starttime"), Status.valueOf(qury.getString("testresult"))))
             }
         }
         return duration
@@ -153,7 +155,7 @@ class DBHelper(){
             var qury:ResultSet
             qury = conn.createStatement().executeQuery("SELECT * from tests_duration where test_id='" + id + "' ORDER BY starttime, _id;")
             while (qury.next()) {
-                duration.add(StatusTime(qury.getDouble("duration"), Status.valueOf(qury.getString("testresult"))))
+                duration.add(StatusTime(qury.getDouble("duration"),qury.getString("starttime"), Status.valueOf(qury.getString("testresult"))))
             }
         }
         return duration
@@ -162,6 +164,12 @@ class DBHelper(){
     fun deletingTest(id:Int){
         opendb { conn ->
             conn.createStatement().execute("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID=$id")
+        }
+    }
+
+    fun deletingFirstFile(){
+        opendb { conn ->
+            conn.createStatement().execute("DELETE FROM $TABLE_BUILD WHERE _id = (SELECT MIN(_id) FROM $TABLE_BUILD)")
         }
     }
 

@@ -2,6 +2,7 @@ package ru.terentev.view
 import javafx.beans.property.StringProperty
 import  ru.terentev.Model.*
 import javafx.collections.FXCollections
+import javafx.scene.layout.Priority
 import ru.terentev.Controllers.DBHelper
 import ru.terentev.Controllers.isRegexp
 import ru.terentev.Controllers.makeDataForTimeChart
@@ -33,13 +34,15 @@ class TableTests : Fragment() {
         }
 
         tableview(rows) {
-            column("name", Row::name).pctWidth(30.0)
-            column("pass amount", Row::pass).pctWidth(10.0)
-            column("fail amount", Row::fail).pctWidth(10.0)
-            column("time variance", Row::varianceform).pctWidth(10.0)
-            column("mean time", Row::meanform).pctWidth(10.0)
+            column("suite", Row::suite).pctWidth(19.0)
+            column("name", Row::name).pctWidth(19.0)
+            column("pass amount", Row::pass).pctWidth(8.0)
+            column("fail amount", Row::fail).pctWidth(8.0)
+            column("time variance", Row::varianceform).pctWidth(8.0)
+            column("mean time", Row::meanform).pctWidth(8.0)
             column("assert massages",Row::assertResult).pctWidth(30.0)
             columnResizePolicy = SmartResize.POLICY
+            vgrow=Priority.ALWAYS
             onUserSelect(1) { row ->
                 selectedRow.set(row.id)
                 makeDataForTimeChart()

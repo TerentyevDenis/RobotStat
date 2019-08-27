@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class Test(var name:String){
+    var suiteName:String?=null
     var status: Status?= null
     var start:LocalDateTime?=null
     var end:LocalDateTime?=null

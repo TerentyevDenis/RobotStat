@@ -60,6 +60,19 @@ class MenuBar : Fragment() {
                     }
                 }
             }
+            item("Delete first uploaded file") {
+                this.setOnAction {
+                    confirm("Confirm delete", "Do you want to delete statistic of first file?") {
+                        runAsync(statusBar) {
+                            DBHelper().deletingFirstFile()
+                            DBHelper().deleteEmptyTests()
+                            updateMessage("Updating table...")
+                            updateProgress(0.4, 1.0)
+                            updateTable()
+                        }
+                    }
+                }
+            }
             item("Clear database") {
                 this.setOnAction {
                     confirm("Confirm delete", "Do you want to clear database?") {

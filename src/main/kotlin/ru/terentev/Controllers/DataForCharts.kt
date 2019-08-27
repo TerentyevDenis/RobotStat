@@ -16,7 +16,7 @@ fun makeDataForTimeChart() {
         for ((i, point) in list.withIndex()) {
             datafortime.add(XYChart.Series<Number, Number>().data(i, point.time, op = {
                 runLater {
-                    this.node.tooltip("time:${point.time}").style(append = true) { fontSize = 12.px }
+                    this.node.tooltip("${point.date},duration: ${point.time} s").style(append = true) { fontSize = 12.px }
                     when (point.status) {
                         Status.PASS -> this.node.style(append = true) { backgroundColor += c("#1aaf10") }
                         Status.FAIL -> this.node.style(append = true) { backgroundColor += c("#ef131c", 0.94) }

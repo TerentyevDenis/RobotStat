@@ -32,6 +32,7 @@ fun import(dirs: List<File>){
 fun xmlparser(str: InputStream):ArrayList<Test>{
     var tests:ArrayList<Test> = ArrayList<Test>()
     var test: Test? = null
+    var suiteName:String?=null
 
     val factory = XmlPullParserFactory.newInstance()
     factory.isNamespaceAware = true
@@ -42,8 +43,11 @@ fun xmlparser(str: InputStream):ArrayList<Test>{
     while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
         val tagname = parser.name
         when (eventType) {
-            XmlPullParser.START_TAG -> if (tagname.equals("test")){
+            XmlPullParser.START_TAG -> if (tagname.equals("suite")){
+                suiteName=parser.getAttributeValue(null, "name")
+            }else if (tagname.equals("test")){
                 test= Test(parser.getAttributeValue(null, "name"))
+                test.suiteName=suiteName
             }else if (tagname.equals("status")&&parser.getAttributeValue(null,"critical")!=null){
                 if  (parser.getAttributeValue(null,"status").equals("PASS")) test?.status= Status.PASS
                 if  (parser.getAttributeValue(null,"status").equals("FAIL")) test?.status= Status.FAIL
