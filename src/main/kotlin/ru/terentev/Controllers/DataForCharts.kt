@@ -59,7 +59,7 @@ fun makeDataForTimeChart() {
             }
             for (i in result.indices) {
                 if (result[i] != -1) {
-                    dataforhist.add(XYChart.Series<String, Number>().data(df.format(i * delta - delta / 2 + min), result[i]))
+                    dataforhist.add(XYChart.Series<String, Number>().data(df.format(i * delta + delta / 2 + min), result[i]))
                 }
             }
         }

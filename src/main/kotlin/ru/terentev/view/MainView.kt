@@ -4,6 +4,7 @@ import ru.terentev.app.Styles
 import javafx.application.Platform.exit
 import javafx.collections.FXCollections
 import javafx.geometry.Orientation
+import javafx.geometry.Pos
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.TabPane
@@ -13,6 +14,7 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import ru.terentev.Controllers.DBHelper
+import ru.terentev.Model.rows
 import tornadofx.*
 import java.time.LocalDate
 import java.time.Period
@@ -31,11 +33,14 @@ class MainView : View("Robot statistic") {
             vgrow = Priority.ALWAYS
             orientation=Orientation.VERTICAL
         }
-        hbox(4.0){
-            progressbar (statusBar.progress)
-            label(statusBar.message)
-            visibleWhen(statusBar.running)
-            paddingAll = 4
+        hbox {
+            hbox(4.0) {
+                progressbar(statusBar.progress)
+                label(statusBar.message)
+                visibleWhen(statusBar.running)
+                paddingAll = 4
+            }
+            hgrow = Priority.ALWAYS
         }
         primaryStage.setOnCloseRequest { DBHelper().saveSettings() }
     }
