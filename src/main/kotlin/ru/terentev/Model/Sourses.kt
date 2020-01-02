@@ -8,6 +8,7 @@ import ru.terentev.Model.Settings.VarianceAssertSettings
 import tornadofx.*
 
 var rows = SortedFilteredList(FXCollections.observableArrayList<Row>())
+var rowsKW = SortedFilteredList(FXCollections.observableArrayList<RowKW>())
 
 var datafortime = FXCollections.observableArrayList<XYChart.Data<Number,Number>>()
 
@@ -18,6 +19,8 @@ val statuses = FXCollections.observableArrayList(Status.All.name,Status.FAIL.nam
 val selectedStatus = SimpleStringProperty()
 
 val selectedRow = SimpleIntegerProperty(-1)
+
+val selectedType = SimpleStringProperty()
 
 var filter = SimpleStringProperty()
 

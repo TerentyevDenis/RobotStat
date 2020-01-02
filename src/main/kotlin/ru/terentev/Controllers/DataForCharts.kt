@@ -13,7 +13,10 @@ fun makeDataForTimeChart() {
     runLater {
         var list = DBHelper().getTimeSeries(selectedRow.value)
         datafortime.remove(0, datafortime.size)
-        for ((i, point) in list.withIndex()) {
+        val amaunt:Int=list.size/1000+1
+        var i=0
+        while (i<=list.size-1){
+            var point = list.get(i)
             datafortime.add(XYChart.Series<Number, Number>().data(i, point.time, op = {
                 runLater {
                     this.node.tooltip("${point.date},duration: ${point.time} s").style(append = true) { fontSize = 12.px }
@@ -23,6 +26,7 @@ fun makeDataForTimeChart() {
                     }
                 }
             }))
+            i+=amaunt
         }
     }
     runLater {

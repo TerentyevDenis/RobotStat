@@ -3,7 +3,7 @@ package ru.terentev.Model
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class Test(var name:String){
+open class Test(var name:String){
     var suiteName:String?=null
     var status: Status?= null
     var start:LocalDateTime?=null

@@ -5,7 +5,9 @@ import javafx.application.Platform.exit
 import javafx.stage.FileChooser
 import ru.terentev.Controllers.DBHelper
 import ru.terentev.Model.rows
+import ru.terentev.Model.rowsKW
 import ru.terentev.Model.selectedRow
+import ru.terentev.Model.selectedType
 import tornadofx.*
 import javax.xml.soap.Node
 
@@ -90,6 +92,8 @@ class MenuBar : Fragment() {
 }
 
 fun getName(id: Int): String {
+    if (selectedType.value.equals("kw_duration"))
+        return rowsKW.filter { it.id == id }.last().name
     return rows.filter { it.id == id }.last().name
 }
 

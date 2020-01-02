@@ -15,6 +15,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import ru.terentev.Controllers.DBHelper
 import ru.terentev.Model.rows
+import ru.terentev.Model.selectedRow
 import tornadofx.*
 import java.time.LocalDate
 import java.time.Period
@@ -49,8 +50,12 @@ class MainView : View("Robot statistic") {
         super.onBeforeShow()
             DBHelper().createTable()
             DBHelper().getSettings()
+        runAsync(statusBar) {
+            updateMessage("Updating table...")
+            updateProgress(0.4, 1.0)
             updateTable()
             ru.terentev.Controllers.assert()
+        }
     }
 }
 
