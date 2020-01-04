@@ -117,14 +117,16 @@ class DBHelper(){
                     conn.createStatement().execute("INSERT INTO $TABLE_BUILD($COLUMN_ADD_DATE) VALUES (CURRENT_TIMESTAMP)")
                     var buildIDqury = conn.createStatement().executeQuery("SELECT $COLUMN_BUILD_ID from $TABLE_BUILD WHERE $COLUMN_BUILD_ID = last_insert_rowid()")
                     var buildID = buildIDqury.getInt("_id")
-                     conn.createStatement().execute("BEGIN TRANSACTION;")
-                        listTest.parallelStream().forEach {
+                    conn.createStatement().execute("BEGIN TRANSACTION;")
+                    listTest.map { test -> Pair(test.name,test.suiteName) }.toSet().parallelStream().forEach {
+                        var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + it.first + "' and $COLUMN_SUITE='" + it.second + "';")
+                        if (!rs.next()) {
+                            conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME, $COLUMN_SUITE) VALUES ('" + it.first + "','" + it.second + "');")
+                        }
+                    }
+                    listTest.parallelStream().forEach {
                             progress.set(i++)
                             var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + it.name + "' and $COLUMN_SUITE='" + it.suiteName + "';")
-                            if (!rs.next()) {
-                                conn.createStatement().execute("INSERT INTO $TABLE_NAME($COLUMN_NAME, $COLUMN_SUITE) VALUES ('" + it.name + "','" + it.suiteName + "');")
-                                rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_NAME WHERE $COLUMN_NAME='" + it.name + "' and $COLUMN_SUITE='" + it.suiteName + "';")
-                            }
                             var test_id = rs.getInt("_id")
                             rs.close()
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -132,15 +134,17 @@ class DBHelper(){
                                     "VALUES (" + test_id + ", strftime('%Y-%m-%d %H:%M:%f','" + formatter.format(it.start) + "'), "
                                     + it.time + ", '" + it.status?.name + "', " + buildID + ");")
                         }
-                        conn.createStatement().execute("END TRANSACTION;")
-                        conn.createStatement().execute("BEGIN TRANSACTION;")
-                        listKeyWord.parallelStream().forEach {
+                    conn.createStatement().execute("END TRANSACTION;")
+                    conn.createStatement().execute("BEGIN TRANSACTION;")
+                    listKeyWord.map { keyword -> Pair(keyword.name,keyword.library) }.toSet().parallelStream().forEach {
+                        var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_KW_NAME WHERE $KW_NAME='" + it.first + "' and $COLUMN_LIBRARY='" + it.second + "';")
+                        if (!rs.next()) {
+                            conn.createStatement().execute("INSERT INTO $TABLE_KW_NAME($KW_NAME, $COLUMN_LIBRARY) VALUES ('" + it.first + "','" + it.second + "');")
+                        }
+                    }
+                    listKeyWord.parallelStream().forEach {
                             progress.set(i++)
                             var rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_KW_NAME WHERE $KW_NAME='" + it.name + "' and $COLUMN_LIBRARY='" + it.library + "';")
-                            if (!rs.next()) {
-                                conn.createStatement().execute("INSERT INTO $TABLE_KW_NAME($KW_NAME, $COLUMN_LIBRARY) VALUES ('" + it.name + "','" + it.library + "');")
-                                rs = conn.createStatement().executeQuery("SELECT _id from $TABLE_KW_NAME WHERE $KW_NAME='" + it.name + "' and $COLUMN_LIBRARY='" + it.library + "';")
-                            }
                             var kw_id = rs.getInt("_id")
                             rs.close()
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -148,7 +152,7 @@ class DBHelper(){
                                     "VALUES (" + kw_id + ", strftime('%Y-%m-%d %H:%M:%f','" + formatter.format(it.start) + "'), "
                                     + it.time + ", '" + it.status?.name + "', " + buildID + ");")
                         }
-                        conn.createStatement().execute("END TRANSACTION;")
+                    conn.createStatement().execute("END TRANSACTION;")
                 }
 
         }
