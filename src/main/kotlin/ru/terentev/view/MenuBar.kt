@@ -4,6 +4,7 @@ import ru.terentev.Controllers.import
 import javafx.application.Platform.exit
 import javafx.stage.FileChooser
 import ru.terentev.Controllers.DBHelper
+import ru.terentev.Controllers.export
 import ru.terentev.Model.rows
 import ru.terentev.Model.rowsKW
 import ru.terentev.Model.selectedRow
@@ -21,6 +22,18 @@ class MenuBar : Fragment() {
                     if (!dirs.isEmpty()) {
                         run {
                             import(dirs)
+                            this.disableWhen(statusBar.running)
+                        }
+                    }
+                }
+            }
+            item("Save test data") {
+                this.setOnAction {
+                    val ef = arrayOf(FileChooser.ExtensionFilter("Files with data (.dat)", "*.dat"))
+                    var dir = tornadofx.chooseFile("Choose file", ef, FileChooserMode.Save)
+                    if (!dir.isEmpty()) {
+                        run {
+                            export(dir)
                             this.disableWhen(statusBar.running)
                         }
                     }

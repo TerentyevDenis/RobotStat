@@ -3,12 +3,11 @@ package ru.terentev.Controllers
 import java.io.File
 import java.io.InputStream
 import org.xmlpull.v1.*
-import ru.terentev.Model.KeyWord
-import ru.terentev.Model.Status
-import ru.terentev.Model.Test
+import ru.terentev.Model.*
 import ru.terentev.view.statusBar
 import ru.terentev.view.updateTable
 import tornadofx.*
+import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.ArrayList
@@ -27,6 +26,21 @@ fun import(dirs: List<File>){
         updateProgress(0.4, 1.0)
         updateTable()
         assert()
+    }
+}
+
+fun export (dir: List<File>){
+    runAsync(statusBar){
+        updateMessage("Creating ${dir[0].name}...")
+        if (selectedRow.value!=-1) {
+            var list = DBHelper().getTimeSeries(selectedRow.value)
+            FileWriter(dir[0].absolutePath)
+                    .use {
+                        for (element in list) {
+                            it.write(element.time.toString() + "\n")
+                        }
+                    }
+        }
     }
 }
 
